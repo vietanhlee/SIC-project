@@ -6,11 +6,15 @@ services:
       - "8000:8000"
     volumes:
       - ./BACKEND:/app
+    env_file:
+      - ./BACKEND/.env
   frontend:
     build: ./
     ports:
       - "3000:3000"
     volumes:
-      - ./FRONTEND/app
+      - ./:/app
     environment:
       - CHOKIDAR_USEPOLLING=true
+    depends_on:
+      - backend

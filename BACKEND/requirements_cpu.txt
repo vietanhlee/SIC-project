@@ -10,3 +10,4 @@ flask
 torch
 torchvision
 torchaudio
+dotenv

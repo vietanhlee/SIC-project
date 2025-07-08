@@ -1,4 +1,4 @@
-import VideoGrid from "./components/VideoGrid";
+import VideoCarousel from "./components/VideoGrid";
 import ChatBox from "./components/ChatBox";
 import React, { useState } from "react";
 
@@ -101,31 +101,29 @@ export default function SmartTrafficSystem() {
 
       <div
         style={{
-          maxWidth: "1400px",
+          maxWidth: "1600px",
           margin: "0 auto",
-          padding: "32px 0",
+          padding: "32px 24px",
           display: "grid",
-          gridTemplateColumns: "2fr 1fr",
+          gridTemplateColumns: "1fr 400px",
           gap: 32,
           minHeight: "calc(100vh - 140px)",
+          alignItems: "start",
         }}
       >
         <div
           style={{
-            marginLeft: 0,
-            marginRight: 0,
-            paddingLeft: 0,
-            paddingRight: 0,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "600px",
+            width: "100%",
           }}
         >
-          <VideoGrid focused={focused} setFocused={setFocused} />
+          <VideoCarousel focused={focused} setFocused={setFocused} />
         </div>
         <div
           style={{
-            marginRight: 0,
-            marginLeft: 0,
-            paddingRight: 0,
-            paddingLeft: 0,
             display: "flex",
             justifyContent: "flex-end",
           }}

@@ -3,7 +3,8 @@
   text-align: center;
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
 }
 
 /* Header Styles */
@@ -145,7 +146,11 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
   pointer-events: none;
 }
 
@@ -166,7 +171,7 @@
   font-size: 18px;
   font-weight: 700;
   margin: 0;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .video-card-status {
@@ -323,7 +328,7 @@
   color: white;
   font-size: 14px;
   font-weight: bold;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .chat-message-avatar.user {
@@ -342,7 +347,7 @@
   border-radius: 20px;
   font-size: 15px;
   line-height: 1.5;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .chat-message-content.user {
@@ -450,19 +455,19 @@
   .video-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .main-container {
     padding: 16px;
   }
-  
+
   .header-title {
     font-size: 32px;
   }
-  
+
   .video-card {
     padding: 16px;
   }
-  
+
   .chat-container {
     height: 500px;
   }
@@ -472,11 +477,11 @@
   .header-title {
     font-size: 24px;
   }
-  
+
   .video-card-stats {
     grid-template-columns: 1fr;
   }
-  
+
   .chat-message-content {
     max-width: 85%;
   }

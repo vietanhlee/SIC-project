@@ -94,8 +94,8 @@ class AnalyzeOnRoad:
         self.boxes = self.speed_tool.track_data.xyxy.cpu().numpy().astype('int')
         self.classes = self.speed_tool.track_data.cls.cpu().numpy().astype('int')
     
-        count_car = np.count_nonzero(self.classes == 0)    
-        count_motor = np.count_nonzero(self.classes == 1)
+        count_car = int(np.count_nonzero(self.classes == 0))
+        count_motor = int(np.count_nonzero(self.classes == 1))
         self.list_count_car.append(count_car)
         self.list_count_motor.append(count_motor)
         

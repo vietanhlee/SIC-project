@@ -9,21 +9,16 @@ ARG DEVICE=cpu
 # chỉ định thư mục làm việc để chạy lệnh
 WORKDIR /app
 
+# Install git
+RUN apt-get update && apt-get install -y git \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install dependencies
-# . = current directory 
-# COPY ./requirements_cpu.txt ./requirements_cpu.txt 
-
-# Copy cả hai file requirements vào container
-COPY requirements_cpu.txt .
-COPY requirements_gpu.txt .
-
-# Chọn file requirements phù hợp dựa trên biến DEVICE
-RUN if [ "$DEVICE" = "gpu" ]; then \
-        pip install --no-cache-dir -r requirements_gpu.txt; \
-    else \
-        pip install --no-cache-dir -r requirements_cpu.txt; \
-    fi
+RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
+    libglib2.0-0
+COPY requirements_cpu.txt ./
+RUN pip install --no-cache-dir -r requirements_cpu.txt
 
 # Copy backend code
 COPY . .
