@@ -7,10 +7,42 @@ from ultralytics import solutions
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 class AnalyzeOnRoadBase:
+    """Class gói gọn script xử lý tuần tự nhưng đảm bảo tính đóng gói OOP
+        Attributes:
+            count_car_display (int): số lượng xe oto trung bình
+            speed_car_display (int): trung bình tốc độ tức thời của oto
+            count_moto_display (int): số lượng xe xe máy trung bình
+            speed_moto_display (int): trung bình tốc độ tức thời của xe máy
+            speed_tool (solutions.SpeedEstimator()): đối tượng SpeedEstimator của YOLO
+            frame_output (np.array): ảnh đã qua xử lý được vẽ hoặc không vẽ (tuỳ vào biến is_draw)\
+            các thông tin được chuẩn đoán
+        Examples:
+            Hướng dẫn chạy xử lý 1 video đơn
+            >>> analyzer = AnalyzeOnRoadBase(
+            >>>     path_video=path_video,
+            >>>     meter_per_pixel=meter_per_pixel,
+            >>>     info_dict=info_dict,
+            >>>     frame_dict=frame_dict,
+            >>>     lock_info=lock_info,
+            >>>     lock_frame=lock_frame,
+            >>> )
+            >>> analyzer.process_on_single_video()
+    """
     def __init__(self, path_video, meter_per_pixel, model_path="best.pt", time_step=30,
                  is_draw=True, device='cpu', iou=0.3, conf=0.2, show=True):
-        
-        """Atributes:
+        """Hàm xử lý uần tự như một Script đơn giản áp dụng YOLO và cải tiến hơn là ở việc gói gọn trong 1 class
+
+        Args:
+            path_video (str): Đường dẫn đến video
+            meter_per_pixel (float): Tỉ lệ 1 mét ngoài đời với 1 pixel
+            model_path (str): Đường dẫn đến model. Defaults to "best.pt".
+            time_step (int): Khoảng thời gian giữa 2 lần cập nhật thông tin các phương tiện. Defaults to 30.
+            is_draw (bool): Biến chỉ định có vẽ các thông tin xử lý được lên frame hay không. Defaults to True.
+            device (str): Dùng GPU hoặc CPU. Defaults to 'cpu'.
+            iou (float): Ngưỡng tin cậy về bounding box . Defaults to 0.3.
+            conf (float): Ngưỡng tin cậy về nhãn được dự đoán. Defaults to 0.2.
+            show (bool): Hiển thị video xử lý qua opencv, đặt là False khi tích làm server tránh lãng phí tài nguyên.\
+            Defaults to True.
         """
         self.speed_tool = solutions.SpeedEstimator(
             model=model_path,
@@ -25,7 +57,7 @@ class AnalyzeOnRoadBase:
         
         self.show = show
         self.path_video = path_video
-        self.name = path_video.split('/')[-1][:-4] if path_video else "Unknown"
+        self.name = path_video.split('/')[-1][:-4] 
         
         self.count_car_display = 0
         self.list_count_car = []
@@ -53,14 +85,24 @@ class AnalyzeOnRoadBase:
     def update_for_vehicle(self):
         """Dành cho subclass định nghĩa, do không cần ở hiện tại"""
         pass
-    def safe_avg_np(self, lst):
-        """Hàm tính trung bình"""
+    def safe_avg_np(self, lst: list) -> int:
+        """Hàm tính trung bình cộng các số dương
+
+        Args:
+            lst (list): list các số đầu vào (tốc độ tức thời các phương tiện)
+
+        Returns:
+            int: giá trị trung bình
+        """
         arr = np.array(lst, dtype=np.int32)
         non_zero = arr[arr != 0]
         return int(non_zero.mean()) if non_zero.size > 0 else 0
+    
     def update_data(self):
-        """Hàm này sẽ được gọi để cập nhật dữ liệu cho frame và thông tin phương tiện"""
-        # Gọi hàm để cập nhật dữ liệu cho frame (luôn được cập nhật đảm bảo tính realtime)
+        """Hàm này sẽ được gọi để cập nhật dữ liệu cho frame và thông tin phương tiện sau một khoảng thời gian\
+            đã thiết lập là time_step"""
+
+        # Gọi hàm này để cập nhật dữ liệu cho frame (luôn được cập nhật đảm bảo tính realtime)
         # Cái này dành cho subclass để cập nhật frame_output 
         self.update_for_frame()
         
@@ -86,20 +128,24 @@ class AnalyzeOnRoadBase:
             self.list_count_motor.clear()
             self.list_speed_car.clear()
             self.list_speed_motor.clear()
-
-    
+   
     def process_single_frame(self, frame_input):
-        """ Hàm này xử lý từng frame một
+        """Hàm này xử lý từng frame một 
+        Args:
+            frame_input (np.array): Ảnh được đọc từ opencv
+        
+        >>> self.speed_tool.track_data
+        Lệnh trên sẽ truy suất thông tin tracking được từ frame đầu vào
         >>> self.speeds = self.speed_tool.spd
         >>> self.ids = self.speed_tool.track_data.id.cpu().numpy().astype('int')
         >>> self.boxes = self.speed_tool.track_data.xyxy.cpu().numpy().astype('int')
         >>> self.classes = self.speed_tool.track_data.cls.cpu().numpy().astype('int')
-        - Tốc độ là một dict với key là id của phương tiện và value là tốc độ tương ứng
-        + ids là một numpy array chứa id của các phương tiện
-        + boxes là một numpy array chứa bounding boxes của các phương tiện
-        + classes là một numpy array chứa class của các phương tiện (0: ô tô, 1: xe máy)"""
-
-        # """Hàm này sẽ được gọi để xử lý từng frame một"""
+        Tốc độ là một dict với key là id của phương tiện và value là tốc độ tương ứng
+        ids là một numpy array chứa id của các phương tiện
+        boxes là một numpy array chứa bounding boxes của các phương tiện
+        classes là một numpy array chứa class của các phương tiện (0: ô tô, 1: xe máy)
+        """
+        
         try:
             # Đặt lại kích thước ảnh đầu vào đủ lớn để xử lý, copy để tránh thay đổi ảnh gốc, cắt ảnh để chỉ predict vùng cần thiết
             frame_in = cv2.resize(frame_input, (600, 400))
@@ -113,7 +159,6 @@ class AnalyzeOnRoadBase:
             self.speed_tool.region = np.array([[50, 400], [50, 280], [370, 130], [600, 130], [600, 400]], np.int32) - np.array([[50, 130]])
             
             # Lấy dữ liệu từ speed_tool như tốc độ, id, bounding boxes và class 
-
             self.speeds = self.speed_tool.spd
             self.ids = self.speed_tool.track_data.id.cpu().numpy().astype('int')
             self.boxes = self.speed_tool.track_data.xyxy.cpu().numpy().astype('int')
@@ -135,11 +180,10 @@ class AnalyzeOnRoadBase:
             if self.is_draw:
                 self.draw_info_to_frame_output()
             
-            # Tính toán xong xuôi sẽ gọi hàm update_data
+            # Tính toán xong xuôi sẽ gọi hàm update_data để cập nhật data ngay lập tức
             self.update_data()
         except Exception as e:
             print(f"Lỗi khi xử lý với file {self.name}: {e}")
-
     def draw_info_to_frame_output(self):
         """Hàm này để vẽ các thông tin lên ảnh"""
         try:
@@ -190,7 +234,7 @@ class AnalyzeOnRoadBase:
         if not cam.isOpened():
             print(f'Không thể mở video: {self.path_video}')
             return
-            
+        
         try:
             while True:
                 check, cap = cam.read()
@@ -217,7 +261,6 @@ class AnalyzeOnRoadBase:
             cam.release()
             if self.show:
                 cv2.destroyAllWindows()
-
 
 #************************************************************************ Script for testing *******************************************************
 if __name__ == "__main__":
